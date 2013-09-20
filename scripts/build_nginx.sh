@@ -5,10 +5,12 @@
 
 NGINX_VERSION=1.5.2
 PCRE_VERSION=8.21
+OPENSSL_VERSION=1.0.1e
 
 nginx_tarball_url=http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
 #pcre_tarball_url=ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-${PCRE_VERSION}.tar.bz2
 pcre_tarball_url=http://garr.dl.sourceforge.net/project/pcre/pcre/${PCRE_VERSION}/pcre-${PCRE_VERSION}.tar.bz2
+openssl_tarball_url=http://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz
 
 temp_dir=$(mktemp -d /tmp/vulcan_nginx.XXXXXXXXXX)
 
@@ -33,7 +35,10 @@ curl $nginx_tarball_url | tar xf -
 echo "Downloading $pcre_tarball_url"
 (cd nginx-${NGINX_VERSION} && curl $pcre_tarball_url | tar xf -)
 
-vulcan build -o ${vulcan_archive_result} -s nginx-${NGINX_VERSION} -v -p /tmp/nginx -c "./configure --with-http_ssl_module --with-pcre=pcre-${PCRE_VERSION} --prefix=/tmp/nginx && make install"
+echo "Downloading $openssl_tarball_url"
+(cd nginx-${NGINX_VERSION} && curl $openssl_tarball_url | tar xf -)
+
+vulcan build -o ${vulcan_archive_result} -s nginx-${NGINX_VERSION} -v -p /tmp/nginx -c "./configure --with-http_ssl_module --with-openssl=openssl-${OPENSSL_VERSION} --with-pcre=pcre-${PCRE_VERSION} --prefix=/tmp/nginx && make install"
 
 echo "Extracting the nginx binary into the buildback"
 mkdir -p $untarring_dir
