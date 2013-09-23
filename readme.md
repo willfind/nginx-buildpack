@@ -1,6 +1,6 @@
 # Heroku Buildpack: NGINX
 
-Nginx-buildpack vendors NGINX inside a dyno and connects NGINX to an app server via UNIX domain sockets.
+Nginx-buildpack vendors NGINX inside a dyno and connects NGINX to an app server via UNIX domain sockets. This fork from the original builds NGINX with ssl support.
 
 ## Motivation
 
