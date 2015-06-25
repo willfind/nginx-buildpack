@@ -3,9 +3,9 @@ daemon off;
 worker_processes 4;
 
 events {
-	use epoll;
-	accept_mutex on;
-	worker_connections 1024;
+    use epoll;
+    accept_mutex on;
+    worker_connections 1024;
 }
 
 http {
@@ -13,31 +13,49 @@ http {
         gzip_comp_level 2;
         gzip_min_length 512;
 
-	log_format l2met 'measure.nginx.service=$request_time request_id=$http_heroku_request_id';
-	access_log logs/nginx/access.log l2met;
-	error_log logs/nginx/error.log;
+    log_format l2met 'measure.nginx.service=$request_time request_id=$http_heroku_request_id';
+    access_log logs/nginx/access.log l2met;
+    error_log logs/nginx/error.log;
 
-	include mime.types;
-	default_type application/octet-stream;
-	sendfile on;
+    include mime.types;
+    default_type application/octet-stream;
+    sendfile on;
 
-	#Must read the body in 5 seconds.
-	client_body_timeout 5;
+    #Must read the body in 5 seconds.
+    client_body_timeout 5;
 
-	upstream app_server {
-		server unix:/tmp/nginx.socket fail_timeout=0;
- 	}
+    upstream app_server {
+        server unix:/tmp/nginx.socket fail_timeout=0;
+    }
 
-	server {
-		listen <%= ENV["PORT"] %>;
-		server_name _;
-		keepalive_timeout 5;
+    server {
+        listen <%= ENV["PORT"] %>;
+        server_name _;
+        keepalive_timeout 5;
+        
+        location /couchdb {
+            rewrite /couchdb/(.*) /$1 break;
+            proxy_pass http://localhost:5984;
+            proxy_redirect off;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_cookie_domain localhost thoughtsaver.ubik.co;
+        }
 
-		location / {
-			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-			proxy_set_header Host $http_host;
-			proxy_redirect off;
-			proxy_pass http://127.0.0.1:8000;
-		}
-	}
+        location ~ ^couchdb/(.*)/_changes {
+            rewrite /couchdb/(.*) /$1 break;
+            proxy_pass http://localhost:5984;
+            proxy_redirect off;
+            proxy_buffering off;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+        
+        location / {
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+            proxy_pass http://127.0.0.1:8000;
+        }
+    }
 }
