@@ -35,16 +35,16 @@ http {
         
         location /couchdb {
             rewrite /couchdb/(.*) /$1 break;
-            proxy_pass http://localhost:5984;
+            proxy_pass https://thoughtsaver.cloudant.com;
             proxy_redirect off;
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_cookie_domain localhost thoughtsaver.ubik.co;
+            proxy_cookie_domain localhost thoughtsaver.herokuapp.com;
         }
 
         location ~ ^couchdb/(.*)/_changes {
             rewrite /couchdb/(.*) /$1 break;
-            proxy_pass http://localhost:5984;
+            proxy_pass https://thoughtsaver.cloudant.com;
             proxy_redirect off;
             proxy_buffering off;
             proxy_set_header Host $host;
