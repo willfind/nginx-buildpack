@@ -32,10 +32,10 @@ http {
         listen <%= ENV["PORT"] %>;
         server_name _;
         keepalive_timeout 5;
-        
+
         location /couchdb {
             rewrite /couchdb/(.*) /$1 break;
-            proxy_pass http://54.175.197.141:5984;
+            proxy_pass https://thoughtsaver.cloudant.com;
             proxy_redirect off;
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -44,13 +44,13 @@ http {
 
         location ~ ^couchdb/(.*)/_changes {
             rewrite /couchdb/(.*) /$1 break;
-            proxy_pass http://54.175.197.141:5984;
+            proxy_pass https://thoughtsaver.cloudant.com;
             proxy_redirect off;
             proxy_buffering off;
             proxy_set_header Host $host;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
-        
+
         location / {
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header Host $http_host;
