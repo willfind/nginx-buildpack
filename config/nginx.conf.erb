@@ -38,13 +38,13 @@ http {
 
             proxy_redirect off;
             proxy_buffering off;
-            proxy_set_header Host thoughtsaver.cloudant.com;
+            proxy_set_header Host 4f091fff-c568-4d4d-98ec-d55dec7d143b-bluemix.cloudant.com;
             # cannot use $host! must specify my vhost on cloudant
 
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             #test
 
-            proxy_pass https://thoughtsaver.cloudant.com;
+            proxy_pass https://4f091fff-c568-4d4d-98ec-d55dec7d143b-bluemix.cloudant.com;
             # must use a variable in this url so that the domain is looked up late.
             # otherwise nginx will fail to start about half the time because of resolver issues
             # (unknown why though)
@@ -52,7 +52,7 @@ http {
 
         location ~ ^couchdb/(.*)/_changes {
             rewrite /couchdb/(.*) /$1 break;
-            proxy_pass https://thoughtsaver.cloudant.com;
+            proxy_pass https://4f091fff-c568-4d4d-98ec-d55dec7d143b-bluemix.cloudant.com;
             proxy_redirect off;
             proxy_buffering off;
             proxy_set_header Host $host;
